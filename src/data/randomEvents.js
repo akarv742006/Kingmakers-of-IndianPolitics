@@ -1,0 +1,51 @@
+export const RANDOM_NATIONAL_EVENTS = [
+  {
+    title: '🌾 National Farmers Protest Surge',
+    description: 'Farmer unions demand legal Guarantee for Minimum Support Price (MSP) in Northern States.',
+    category: 'WELFARE',
+    affectedStates: ['Punjab', 'Haryana', 'Uttar Pradesh'],
+    partyImpact: { inc: 4, sp: 5, bjp: -4 },
+  },
+  {
+    title: '🚀 Economic & Semiconductor Investment Boom',
+    description: 'Major global tech giant announces $10 Billion Semiconductor Fab plant in Gujarat and South India.',
+    category: 'ECONOMIC',
+    affectedStates: ['Gujarat', 'Tamil Nadu', 'Karnataka'],
+    partyImpact: { bjp: 5, dmk: 3 },
+  },
+  {
+    title: '🛡️ Border Defense Triumph',
+    description: 'Indian Armed Forces successfully neutralize cross-border infiltration attempt in Jammu & Kashmir.',
+    category: 'SECURITY',
+    affectedStates: ['Jammu and Kashmir', 'Punjab', 'Rajasthan', 'Uttar Pradesh', 'Madhya Pradesh'],
+    partyImpact: { bjp: 6, inc: -2 },
+  },
+  {
+    title: '⚖️ Supreme Court Orders Universal Caste Survey',
+    description: 'Supreme Court directs central and state governments to publish socio-economic caste census metrics.',
+    category: 'JUDICIAL',
+    affectedStates: ['Bihar', 'Uttar Pradesh', 'Maharashtra'],
+    partyImpact: { sp: 5, inc: 4, bjp: -2 },
+  },
+  {
+    title: '🌧️ Monsoon Deluge & Flood Relief Operation',
+    description: 'Heavy rains disrupt coastal trade. Relief funds rapidly disbursed by Union and State disaster management.',
+    category: 'WELFARE',
+    affectedStates: ['Assam', 'Kerala', 'West Bengal', 'Odisha'],
+    partyImpact: { tmc: 4, inc: 3, bjp: 2 },
+  },
+  {
+    title: '💸 Fuel Price Subsidy Announcement',
+    description: 'Government announces ₹10 reduction in petrol and diesel prices nationwide ahead of poll phases.',
+    category: 'ECONOMIC',
+    affectedStates: [],
+    partyImpact: { bjp: 5, inc: -3, aap: -2 },
+  },
+  {
+    title: '🔍 Major Financial Scam Uncovered by ED',
+    description: 'Enforcement Directorate uncovers illicit offshore wealth linked to key politicians.',
+    category: 'SCANDAL',
+    affectedStates: ['Delhi', 'Maharashtra'],
+    partyImpact: { aap: -5, inc: -3, bjp: 4 },
+  },
+];
