@@ -470,6 +470,7 @@ export const GameProvider = ({ children }) => {
     };
 
     setHansardFloorMessages((prev) => [...prev, newMsg]);
+    socketService.emitHansardSpeech(newMsg);
 
     const newsArticle = {
       id: `news-parl-${Date.now()}`,
@@ -1165,6 +1166,10 @@ export const GameProvider = ({ children }) => {
   const proposeBill = (billData) => {
     const res = ServerGameEngine.proposeBillWithPoliticalCapital(getAuthoritativeState(), billData);
     applyEngineResult(res);
+    if (res && res.success && res.state && res.state.bills && res.state.bills[0]) {
+      socketService.emitProposeBill(res.state.bills[0]);
+    }
+    return res;
   };
 
   const advanceBillStage = (billId, nextStage) => {
@@ -1265,6 +1270,10 @@ export const GameProvider = ({ children }) => {
   const voteAndProcessBill = (billId, playerVote) => {
     const res = ServerGameEngine.processFloorVote(getAuthoritativeState(), billId, selectedPartyId, playerVote);
     applyEngineResult(res);
+    if (res && res.success) {
+      socketService.emitCastVote(billId, playerVote, userHandle);
+    }
+    return res;
   };
 
   const submitCustomPartyApplication = (data) => {
@@ -1470,9 +1479,7 @@ export const GameProvider = ({ children }) => {
       });
     }
 
-    if (socketService.socket && socketService.socket.connected) {
-      socketService.emitCourtroomMessage(courtMsg);
-    }
+    socketService.emitCourtroomMessage(courtMsg);
   };
 
   const askCourtQuestion = (questionText) => {
@@ -1494,9 +1501,7 @@ export const GameProvider = ({ children }) => {
       bias: 'NEUTRAL',
     });
 
-    if (socketService.socket && socketService.socket.connected) {
-      socketService.emitCourtroomMessage(newMsg);
-    }
+    socketService.emitCourtroomMessage(newMsg);
   };
 
   const triggerSuddenEmergencyCrisis = (crisisType, customTitle, detailsText) => {
@@ -1552,9 +1557,7 @@ export const GameProvider = ({ children }) => {
     };
     setEvents((prev) => [newEvent, ...prev]);
 
-    if (socketService.socket && socketService.socket.connected) {
-      socketService.emitEmergencyCrisis(newEvent);
-    }
+    socketService.emitEmergencyCrisis(newEvent);
 
     return { success: true, message: `Emergency Crisis '${config.title}' triggered nationwide!` };
   };
