@@ -6,6 +6,7 @@ export const P2PMultiplayerModal = ({ isOpen, onClose }) => {
   const {
     p2pRoomCode,
     PERMANENT_NATIONAL_ROOM_CODE,
+    setAdminPermanentRoomCode,
     isP2PConnected,
     isP2PHost,
     connectedPeers,
@@ -43,7 +44,8 @@ export const P2PMultiplayerModal = ({ isOpen, onClose }) => {
   const handleAdminSetPermanentRoom = (e) => {
     e.preventDefault();
     if (adminCustomCode.trim()) {
-      joinP2PRoom(adminCustomCode.trim());
+      const res = setAdminPermanentRoomCode(adminCustomCode.trim());
+      if (res && res.message) alert(res.message);
       setAdminCustomCode('');
     }
   };

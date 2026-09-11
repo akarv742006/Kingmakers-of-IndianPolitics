@@ -120,11 +120,13 @@ export const GameProvider = ({ children }) => {
     appointedTimestamp: 'Constitutional Appointment',
   });
 
-  // Permanent National Room Code
-  const PERMANENT_NATIONAL_ROOM_CODE = 'LOK_SABHA_PERMANENT_PARLIAMENT';
+  // Dynamic Permanent National Room Code
+  const [permanentRoomCode, setPermanentRoomCode] = useState(() => {
+    return localStorage.getItem('mandate_permanent_room_code') || 'LOK_SABHA_PERMANENT_PARLIAMENT';
+  });
 
   // P2P WebRTC Multiplayer Room State
-  const [p2pRoomCode, setP2PRoomCode] = useState(PERMANENT_NATIONAL_ROOM_CODE);
+  const [p2pRoomCode, setP2PRoomCode] = useState(permanentRoomCode);
   const [isP2PConnected, setIsP2PConnected] = useState(false);
   const [isP2PHost, setIsP2PHost] = useState(false);
   const [connectedPeers, setConnectedPeers] = useState([]);
@@ -137,7 +139,7 @@ export const GameProvider = ({ children }) => {
   });
 
   const joinP2PRoom = (code) => {
-    const cleanCode = (code || PERMANENT_NATIONAL_ROOM_CODE).trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+    const cleanCode = (code || permanentRoomCode || 'LOK_SABHA_PERMANENT_PARLIAMENT').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
     setP2PRoomCode(cleanCode);
     p2pService.joinRoom(
       cleanCode,
@@ -153,6 +155,14 @@ export const GameProvider = ({ children }) => {
     setIsP2PConnected(true);
   };
 
+  const setAdminPermanentRoomCode = (newCode) => {
+    const clean = (newCode || 'LOK_SABHA_PERMANENT_PARLIAMENT').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+    setPermanentRoomCode(clean);
+    localStorage.setItem('mandate_permanent_room_code', clean);
+    joinP2PRoom(clean);
+    return { success: true, message: `Official Permanent National Room Code updated to: ${clean}` };
+  };
+
   const leaveP2PRoom = () => {
     p2pService.leaveRoom();
     setIsP2PConnected(false);
@@ -162,13 +172,13 @@ export const GameProvider = ({ children }) => {
 
   // Auto-connect to Permanent National Room on mount
   useEffect(() => {
-    joinP2PRoom(PERMANENT_NATIONAL_ROOM_CODE);
+    joinP2PRoom(permanentRoomCode);
 
     p2pService.on('PLAYER_LIST_UPDATED', (peerList) => {
       setConnectedPeers(peerList || []);
       setIsP2PHost(p2pService.isHost);
     });
-  }, [userHandle, role, selectedPartyId]);
+  }, [userHandle, role, selectedPartyId, permanentRoomCode]);
 
   const claimLeadershipIfVacant = (targetPartyId, handleInput) => {
     if (!targetPartyId || !handleInput) return;
@@ -2298,7 +2308,8 @@ export const GameProvider = ({ children }) => {
         setSimulationSpeed,
         resetGame,
         p2pRoomCode,
-        PERMANENT_NATIONAL_ROOM_CODE,
+        PERMANENT_NATIONAL_ROOM_CODE: permanentRoomCode,
+        setAdminPermanentRoomCode,
         isP2PConnected,
         isP2PHost,
         connectedPeers,
