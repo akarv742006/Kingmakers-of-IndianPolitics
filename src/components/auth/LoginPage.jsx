@@ -189,7 +189,7 @@ export const LoginPage = () => {
         <div className="text-center space-y-3">
           <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 p-1 shadow-2xl shadow-amber-500/30 overflow-hidden mb-2">
             <img
-              src="https://cdn.discordapp.com/attachments/1538232204956532829/1546024441027498024/IMG_20260906_103715.png?ex=6a9e46f6&is=6a9cf576&hm=ea6df0868a68bb61142240dc83d558bd9f62dab421c8340a9daa05c3c956b43f"
+              src="https://cdn.discordapp.com/attachments/1538232204956532829/1547676199356997775/1b6aa2012-57c8-48a2-93c4-c4c2231d233c.png?ex=6aa4f208&is=6aa3a088&hm=93da735dadad4601564ceefcec3e94e4b1c8cc21f4765cd10c0dc6872e6e6cf2"
               alt="Kingmakers Logo"
               className="w-full h-full object-cover rounded-[20px]"
             />

@@ -3,9 +3,11 @@ import { useGame } from '../../context/GameContext.jsx';
 import { LiveMediaTicker } from '../media/LiveMediaTicker.jsx';
 import { CourtComplaintModal } from '../judge/CourtComplaintModal.jsx';
 import { PartyFundTransferModal } from '../politician/PartyFundTransferModal.jsx';
+import { P2PMultiplayerModal } from '../modals/P2PMultiplayerModal.jsx';
 import { HourlyCollectorWidget } from '../dashboard/HourlyCollectorWidget.jsx';
 import { ECILayout } from './ECILayout.jsx';
 import {
+  Radio,
   Home,
   Megaphone,
   Vote,
@@ -47,6 +49,8 @@ export const GameLayout = ({ activeTab, setActiveTab, children }) => {
     userHandle,
     role,
     logoutUser,
+    isP2PConnected,
+    p2pRoomCode,
   } = useGame();
 
   // If role is ECI (Election Commission), render separate dedicated ECI interface!
@@ -60,6 +64,7 @@ export const GameLayout = ({ activeTab, setActiveTab, children }) => {
   const [countdown, setCountdown] = useState({ days: 15, hrs: 8, mins: 45, secs: 32 });
   const [isCourtModalOpen, setIsCourtModalOpen] = useState(false);
   const [isPartyFundModalOpen, setIsPartyFundModalOpen] = useState(false);
+  const [isP2PModalOpen, setIsP2PModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Countdown timer tick
@@ -256,6 +261,18 @@ export const GameLayout = ({ activeTab, setActiveTab, children }) => {
             {/* Right Action Icons & Election Commission Office Button */}
             <div className="flex flex-wrap items-center gap-2">
               <button
+                onClick={() => setIsP2PModalOpen(true)}
+                className={`px-3.5 py-2.5 rounded-2xl border text-xs font-black flex items-center gap-1.5 transition shadow-md ${
+                  isP2PConnected
+                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/30'
+                    : 'bg-emerald-600/30 border-emerald-500/40 text-emerald-400 hover:text-white hover:bg-emerald-600/50'
+                }`}
+              >
+                <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                <span>{isP2PConnected ? `🟢 P2P: ${p2pRoomCode}` : '⚡ FREE MULTIPLAYER (P2P)'}</span>
+              </button>
+
+              <button
                 onClick={() => setIsCourtModalOpen(true)}
                 className="px-3.5 py-2.5 rounded-2xl bg-purple-600/20 border border-purple-500/40 text-purple-300 hover:text-white font-extrabold text-xs flex items-center gap-1.5 transition shadow-md"
               >
@@ -399,9 +416,10 @@ export const GameLayout = ({ activeTab, setActiveTab, children }) => {
         </div>
       </footer>
 
-      {/* Court & Party Fund Modals */}
+      {/* Court, Party Fund & P2P Multiplayer Modals */}
       <CourtComplaintModal isOpen={isCourtModalOpen} onClose={() => setIsCourtModalOpen(false)} />
       <PartyFundTransferModal isOpen={isPartyFundModalOpen} onClose={() => setIsPartyFundModalOpen(false)} />
+      <P2PMultiplayerModal isOpen={isP2PModalOpen} onClose={() => setIsP2PModalOpen(false)} />
     </div>
   );
 };

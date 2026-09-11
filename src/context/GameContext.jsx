@@ -6,6 +6,7 @@ import { CRISIS_EVENT_TEMPLATES } from '../data/crisisEventsData.js';
 import { ServerGameEngine } from '../engine/serverEngine.js';
 import { PoliticalMechanicsEngine } from '../engine/politicalMechanicsEngine.js';
 import { socketService } from '../services/socketService.js';
+import { p2pService } from '../services/p2pService.js';
 
 const GameContext = createContext(undefined);
 
@@ -118,6 +119,50 @@ export const GameProvider = ({ children }) => {
     totalSeatsWon: 285,
     appointedTimestamp: 'Constitutional Appointment',
   });
+
+  // P2P WebRTC Multiplayer Room State
+  const [p2pRoomCode, setP2PRoomCode] = useState('LOK_SABHA_MAIN');
+  const [isP2PConnected, setIsP2PConnected] = useState(false);
+  const [isP2PHost, setIsP2PHost] = useState(false);
+  const [connectedPeers, setConnectedPeers] = useState([]);
+
+  const getLocalStateForP2PHost = () => ({
+    hansardMessages: hansardFloorMessages,
+    parliamentBills: bills,
+    articles: articles,
+    seats: seats,
+  });
+
+  const joinP2PRoom = (code) => {
+    const cleanCode = (code || 'LOK_SABHA_MAIN').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+    setP2PRoomCode(cleanCode);
+    p2pService.joinRoom(
+      cleanCode,
+      {
+        handle: userHandle,
+        role: role,
+        partyId: selectedPartyId,
+        constituency: userConstituency,
+        state: userState,
+      },
+      getLocalStateForP2PHost
+    );
+    setIsP2PConnected(true);
+  };
+
+  const leaveP2PRoom = () => {
+    p2pService.leaveRoom();
+    setIsP2PConnected(false);
+    setIsP2PHost(false);
+    setConnectedPeers([]);
+  };
+
+  useEffect(() => {
+    p2pService.on('PLAYER_LIST_UPDATED', (peerList) => {
+      setConnectedPeers(peerList || []);
+      setIsP2PHost(p2pService.isHost);
+    });
+  }, []);
 
   const claimLeadershipIfVacant = (targetPartyId, handleInput) => {
     if (!targetPartyId || !handleInput) return;
@@ -2238,18 +2283,20 @@ export const GameProvider = ({ children }) => {
         setGoverningPartyId,
         primeMinisterDetails,
         setPrimeMinisterDetails,
-        castVoteInConstituency,
         postEVMVotesToConstituency,
         tallyAllConstituenciesAndElectPM,
-        collectVotesThroughRally,
-        collectVotesThroughPressMeet,
-        collectVotesThroughDebate,
         triggerSuddenEmergencyCrisis,
         announceGeneralElection,
         advanceElectionPhase,
         toggleSimulation: () => setIsSimulationRunning((prev) => !prev),
         setSimulationSpeed,
         resetGame,
+        p2pRoomCode,
+        isP2PConnected,
+        isP2PHost,
+        connectedPeers,
+        joinP2PRoom,
+        leaveP2PRoom,
       }}
     >
       {children}
