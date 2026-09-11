@@ -227,21 +227,29 @@ export const GameProvider = ({ children }) => {
     { id: 'min-2', partyId: 'bjp', portfolioName: 'Finance Ministry', ministerName: 'Nirmala Sitharaman', announcedBy: '@PartyHighCommand', timestamp: '3 days ago' },
   ]);
 
-  const registerPoliticianAccount = ({ handle, password, partyId }) => {
+  const registerPoliticianAccount = ({ handle, password, partyId, constituency, state }) => {
     const cleanHandle = handle.trim().startsWith('@') ? handle.trim() : `@${handle.trim()}`;
+    const handleKey = cleanHandle.toLowerCase();
+    const newAccount = {
+      handle: cleanHandle,
+      password: password || 'leader123',
+      partyId: partyId || 'bjp',
+      role: 'politician',
+      designation: 'Member of Legislative Assembly (MLA)',
+      level: 3,
+      constituency: constituency || userConstituency,
+      state: state || userState,
+      createdAt: Date.now(),
+    };
+
     const updated = {
       ...registeredAccounts,
-      [cleanHandle.toLowerCase()]: {
-        handle: cleanHandle,
-        password: password || 'leader123',
-        partyId: partyId || 'bjp',
-        role: 'politician',
-      },
+      [handleKey]: newAccount,
     };
     setRegisteredAccounts(updated);
     localStorage.setItem('mandate_registered_accounts', JSON.stringify(updated));
     claimLeadershipIfVacant(partyId || 'bjp', cleanHandle);
-    return { success: true, message: `Account for ${cleanHandle} created successfully!` };
+    return { success: true, message: `Account for ${cleanHandle} created! Career progress enabled.` };
   };
 
   const [rolePasswords, setRolePasswords] = useState(() => {
@@ -765,27 +773,44 @@ export const GameProvider = ({ children }) => {
 
   const loginUser = ({ handle, role: selectedRole, partyId }) => {
     const finalHandle = handle && handle.trim() ? (handle.startsWith('@') ? handle : `@${handle}`) : '@Candidate';
+    const handleKey = finalHandle.toLowerCase();
 
-    const activePartyId = partyId || selectedPartyId;
-    if (isLoggedIn && partyId && partyId !== selectedPartyId) {
-      switchParty(partyId);
-    } else if (partyId) {
-      setSelectedPartyId(partyId);
+    // Restore saved account progress
+    const savedAccount = registeredAccounts[handleKey];
+    const restoredPartyId = savedAccount?.partyId || partyId || selectedPartyId;
+    const restoredRole = savedAccount?.role || selectedRole || role;
+
+    if (savedAccount?.state) {
+      setUserState(savedAccount.state);
+      localStorage.setItem('mandate_user_state', savedAccount.state);
+    }
+    if (savedAccount?.constituency) {
+      setUserConstituency(savedAccount.constituency);
+      localStorage.setItem('mandate_user_constituency', savedAccount.constituency);
+    }
+
+    if (isLoggedIn && restoredPartyId && restoredPartyId !== selectedPartyId) {
+      switchParty(restoredPartyId);
+    } else {
+      setSelectedPartyId(restoredPartyId);
     }
 
     setUserHandle(finalHandle);
-    localStorage.setItem('mandate_user_handle', finalHandle);
-    const activeRole = selectedRole || role;
-    if (selectedRole) {
-      setRole(selectedRole);
-    }
-    setIsLoggedIn(true);
-    localStorage.setItem('mandate_is_logged_in', 'true');
+    setRole(restoredRole);
 
-    if (activeRole === 'politician') {
-      claimLeadershipIfVacant(activePartyId, finalHandle);
+    localStorage.setItem('mandate_user_handle', finalHandle);
+    localStorage.setItem('mandate_user_role', restoredRole);
+    localStorage.setItem('mandate_user_party_id', restoredPartyId);
+    localStorage.setItem('mandate_is_logged_in', 'true');
+    setIsLoggedIn(true);
+
+    if (restoredRole === 'politician') {
+      claimLeadershipIfVacant(restoredPartyId, finalHandle);
     }
-    return { success: true, message: `Welcome back, ${finalHandle}!` };
+    return {
+      success: true,
+      message: `Welcome back, ${finalHandle}! Continued saved career progress (${savedAccount?.designation || restoredRole.toUpperCase()}).`,
+    };
   };
 
   const logoutUser = () => {
