@@ -120,8 +120,11 @@ export const GameProvider = ({ children }) => {
     appointedTimestamp: 'Constitutional Appointment',
   });
 
+  // Permanent National Room Code
+  const PERMANENT_NATIONAL_ROOM_CODE = 'LOK_SABHA_PERMANENT_PARLIAMENT';
+
   // P2P WebRTC Multiplayer Room State
-  const [p2pRoomCode, setP2PRoomCode] = useState('LOK_SABHA_MAIN');
+  const [p2pRoomCode, setP2PRoomCode] = useState(PERMANENT_NATIONAL_ROOM_CODE);
   const [isP2PConnected, setIsP2PConnected] = useState(false);
   const [isP2PHost, setIsP2PHost] = useState(false);
   const [connectedPeers, setConnectedPeers] = useState([]);
@@ -134,7 +137,7 @@ export const GameProvider = ({ children }) => {
   });
 
   const joinP2PRoom = (code) => {
-    const cleanCode = (code || 'LOK_SABHA_MAIN').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+    const cleanCode = (code || PERMANENT_NATIONAL_ROOM_CODE).trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
     setP2PRoomCode(cleanCode);
     p2pService.joinRoom(
       cleanCode,
@@ -157,12 +160,15 @@ export const GameProvider = ({ children }) => {
     setConnectedPeers([]);
   };
 
+  // Auto-connect to Permanent National Room on mount
   useEffect(() => {
+    joinP2PRoom(PERMANENT_NATIONAL_ROOM_CODE);
+
     p2pService.on('PLAYER_LIST_UPDATED', (peerList) => {
       setConnectedPeers(peerList || []);
       setIsP2PHost(p2pService.isHost);
     });
-  }, []);
+  }, [userHandle, role, selectedPartyId]);
 
   const claimLeadershipIfVacant = (targetPartyId, handleInput) => {
     if (!targetPartyId || !handleInput) return;
@@ -2292,6 +2298,7 @@ export const GameProvider = ({ children }) => {
         setSimulationSpeed,
         resetGame,
         p2pRoomCode,
+        PERMANENT_NATIONAL_ROOM_CODE,
         isP2PConnected,
         isP2PHost,
         connectedPeers,
