@@ -17,6 +17,7 @@ export const P2PMultiplayerModal = ({ isOpen, onClose }) => {
   } = useGame();
 
   const [inputRoomCode, setInputRoomCode] = useState('');
+  const [customRoomInput, setCustomRoomInput] = useState('');
   const [copied, setCopied] = useState(false);
   const [adminCustomCode, setAdminCustomCode] = useState('');
 
@@ -197,19 +198,48 @@ export const P2PMultiplayerModal = ({ isOpen, onClose }) => {
             <div>
               <div className="flex items-center space-x-2 text-indigo-400 font-semibold text-sm mb-1">
                 <Sparkles className="w-4 h-4" />
-                <span>Host Private Sub-Room</span>
+                <span>Create Custom Room</span>
               </div>
-              <p className="text-xs text-slate-400 mb-3">
-                Create a private room code for custom party debates or regional elections.
+              <p className="text-xs text-slate-400 mb-2">
+                Type your custom room name or auto-generate a new room code.
               </p>
             </div>
-            <button
-              onClick={handleCreateNewRoom}
-              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium text-xs py-2.5 px-4 rounded-lg shadow-lg flex items-center justify-center space-x-2 transition"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>Create Custom Room</span>
-            </button>
+            <div className="space-y-2">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (customRoomInput.trim()) {
+                    joinP2PRoom(customRoomInput.trim());
+                    setCustomRoomInput('');
+                  } else {
+                    handleCreateNewRoom();
+                  }
+                }}
+                className="flex space-x-2"
+              >
+                <input
+                  type="text"
+                  value={customRoomInput}
+                  onChange={(e) => setCustomRoomInput(e.target.value.toUpperCase())}
+                  placeholder="e.g. TAMIL_NADU_SABHA"
+                  className="flex-1 bg-slate-900 border border-slate-700 text-white text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"
+                />
+                <button
+                  type="submit"
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-3 py-2 rounded-lg transition shrink-0"
+                >
+                  Create
+                </button>
+              </form>
+              <button
+                type="button"
+                onClick={handleCreateNewRoom}
+                className="w-full text-slate-400 hover:text-indigo-300 text-[11px] font-medium flex items-center justify-center space-x-1 py-1 transition"
+              >
+                <Share2 className="w-3 h-3" />
+                <span>Auto-Generate Random Code</span>
+              </button>
+            </div>
           </div>
 
           {/* Join Existing Room */}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../../context/GameContext.jsx';
+import { P2PMultiplayerModal } from '../modals/P2PMultiplayerModal.jsx';
 import {
+  Radio,
   Vote,
   Scale,
   Newspaper,
@@ -43,10 +45,13 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenNewPartyModal }) => {
     setSimulationSpeed,
     advanceElectionPhase,
     governmentApproval,
+    isP2PConnected,
+    p2pRoomCode,
   } = useGame();
 
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isP2PModalOpen, setIsP2PModalOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme || 'royal-sovereign');
@@ -240,6 +245,20 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenNewPartyModal }) => {
             </div>
           )}
 
+          {/* P2P Multiplayer Button */}
+          <button
+            onClick={() => setIsP2PModalOpen(true)}
+            className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition shadow-sm ${
+              isP2PConnected
+                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/30'
+                : 'bg-emerald-600/30 border-emerald-500/40 text-emerald-400 hover:text-white hover:bg-emerald-600/50'
+            }`}
+            title="P2P Multiplayer Room Control"
+          >
+            <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+            <span>{isP2PConnected ? `🟢 P2P: ${p2pRoomCode}` : '⚡ MULTIPLAYER (P2P)'}</span>
+          </button>
+
           {/* Theme Dropdown */}
           <div className="flex items-center p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
             {isLightTheme ? <Sun className="w-3.5 h-3.5 text-amber-400 ml-1.5" /> : <Palette className="w-3.5 h-3.5 text-amber-400 ml-1.5" />}
@@ -389,6 +408,9 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenNewPartyModal }) => {
           </div>
         </div>
       )}
+
+      {/* P2P Multiplayer Room Control Modal */}
+      <P2PMultiplayerModal isOpen={isP2PModalOpen} onClose={() => setIsP2PModalOpen(false)} />
     </header>
   );
 };
